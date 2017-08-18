@@ -15,6 +15,7 @@ from .database import database
 
 logger = logging.getLogger(__name__)
 
+
 class BaseModel(Model):
     created_at = TimestampField(default=datetime.now)
     updated_at = TimestampField()
@@ -71,6 +72,7 @@ class GmailThread(BaseModel):
     STATE_10D = '10d'
     STATE_14D = '14d'
     STATE_ARCHIVED = 'archived'
+    STATE_FINAL = 'final'
 
     GMAIL_LABELS = {
         STATE_INITIAL: None,
@@ -94,10 +96,14 @@ class GmailThread(BaseModel):
         return [
             {
                 'trigger': 'next',
-                'source': [self.STATE_INITIAL, self.STATE_14D, self.STATE_ARCHIVED],
+                'source': [self.STATE_INITIAL, self.STATE_14D],
                 'dest': self.STATE_ARCHIVED,
                 'conditions': partial(self.has_time_elapsed, '15d'),
                 'before': self.archive,
+            }, {
+                'trigger': 'next',
+                'source': [self.STATE_ARCHIVED, self.STATE_FINAL],
+                'dest': self.STATE_FINAL,
             },
         ] + [
             {
@@ -132,9 +138,9 @@ class GmailThread(BaseModel):
             after_state_change='save',
         )
 
-    def has_time_elapsed(self, time):
-        time = int(time[:-1])
-        return (datetime.now() - self.sent_at).total_seconds() > time * DAYS
+    def has_time_elapsed(self, state_name):
+        ndays = int(state_name[:-1])
+        return (datetime.now() - self.sent_at).total_seconds() > ndays * DAYS
 
     def change_labels(self, source, destination):
         logger.debug('changing labels from %s to %s', source, destination)
