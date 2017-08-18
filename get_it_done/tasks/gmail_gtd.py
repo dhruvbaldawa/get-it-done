@@ -1,5 +1,3 @@
-import time
-
 import logging
 from asyncio import gather
 
@@ -7,7 +5,7 @@ from box import Box
 
 from ..database import database
 from ..external.google_oauth2 import get_google_client
-from ..models import OAuthUser, GmailThread
+from ..models import GmailThread, OAuthUser
 
 logger = logging.getLogger(__name__)
 

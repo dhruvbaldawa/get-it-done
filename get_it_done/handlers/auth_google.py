@@ -1,10 +1,11 @@
 import time
+
 from box import Box
 from tornado.auth import GoogleOAuth2Mixin
+from tornado.options import options
 from tornado.web import RequestHandler
 
 from ..models import OAuthUser
-from tornado.options import options
 
 
 class GoogleOAuth2LoginHandler(RequestHandler, GoogleOAuth2Mixin):

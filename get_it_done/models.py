@@ -1,16 +1,15 @@
-from datetime import datetime
+import logging
 import time
+from datetime import datetime
 from functools import partial
 
-import logging
-import asyncio
 from peewee import *
 from playhouse.postgres_ext import ArrayField
 from transitions import Machine
 
 from get_it_done.external.google_oauth2 import get_google_client
 from get_it_done.utils import run_sync
-from .constants import MINUTES, DAYS
+from .constants import DAYS, MINUTES
 from .database import database
 
 logger = logging.getLogger(__name__)

@@ -2,12 +2,11 @@
 
 """Global settings for the project"""
 
-import os.path
 import logging.config
+import os.path
 
 from envparse import env
 from tornado.options import define
-
 
 define("port", default=8000, help="run on the given port", type=int)
 define("config", default=None, help="tornado config file")
