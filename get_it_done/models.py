@@ -1,19 +1,21 @@
-import datetime
+from datetime import datetime
 
 from peewee import *
 from playhouse.postgres_ext import ArrayField
+
+from .constants import MINUTES
 from .database import database
 
 
 class BaseModel(Model):
-    created_at = TimestampField(default=datetime.datetime.now)
+    created_at = TimestampField(default=datetime.now)
     updated_at = TimestampField()
 
     class Meta:
         database = database
 
     def save(self, *args, **kwargs):
-        self.updated_at = datetime.datetime.now()
+        self.updated_at = datetime.now()
         super().save(*args, **kwargs)
 
 
@@ -33,6 +35,14 @@ class OAuthUser(BaseModel):
         except IntegrityError:
             user_info.pop('refresh_token')
             OAuthUser.update(**user_info).where(OAuthUser.id == user_id).execute()
+
+    @classmethod
+    def update_credentials(cls, user_id, access_token, token_expiry):
+        OAuthUser.update(access_token=access_token, token_expiry=token_expiry)\
+            .where(OAuthUser.id == user_id).execute()
+
+    def is_token_expiring(self):
+        return (self.token_expiry - datetime.now()).total_seconds() > (30 * MINUTES)
 
 
 class GmailThread(BaseModel):

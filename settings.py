@@ -16,10 +16,12 @@ define("db-user", default="get_it_done", help="Database user", type=str)
 define("db-pass", default="get_it_done", help="Database password", type=str)
 define("db-name", default="get_it_done", help="Database name", type=str)
 define("weburl", default="http://localhost:8000", help="URL of the website", type=str)
+define("google-client-key", default=env("GOOGLE_OAUTH_KEY"), help="Google Client Key", type="str")
+define("google-client-secret", default=env("GOOGLE_OAUTH_SECRET"), help="Google Client Secret", type="str")
 
 __BASE_PACKAGE__ = "get_it_done"
 
-settings = {}
+settings = dict()
 
 settings["debug"] = True
 settings["cookie_secret"] = "U14CjAyX9uavn9myPVGG9w8gd"
