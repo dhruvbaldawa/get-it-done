@@ -38,10 +38,17 @@ settings["google_oauth"] = {
 logging.config.dictConfig({
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': ' %(levelname)s [%(asctime)s][%(name)s.%(funcName)s:%(lineno)d] %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        }
+    },
     'handlers': {
         'stdout': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
+            'formatter': 'default',
         },
     },
     'loggers': {

@@ -2,10 +2,12 @@ from http import HTTPStatus
 from urllib.parse import urlencode
 
 import logging
+import json
 from aiohttp import ClientSession
 from tornado.options import options
 
 logger = logging.getLogger(__name__)
+
 
 class ClientError(Exception):
     def __init__(self, status, body, headers):
@@ -81,5 +83,25 @@ class GoogleOAuth2Client(object):
         headers = self._build_authorization_header(access_token)
 
         resp = await self.request('GET', f'/gmail/v1/users/{user}/threads/{thread_id}', params=params, headers=headers)
+
+        return resp
+
+    async def change_thread_label(self, access_token, thread_id, user='me', add_labels=None, remove_labels=None):
+        body = {}
+        if add_labels is not None:
+            body['addLabelIds'] = list(add_labels)
+
+        if remove_labels is not None:
+            body['removeLabelIds'] = list(remove_labels)
+        body = json.dumps(body)
+        headers = self._build_authorization_header(access_token)
+        headers['Content-Type'] = 'application/json'
+
+        resp = await self.request(
+            'POST',
+            f'/gmail/v1/users/{user}/threads/{thread_id}/modify',
+            data=body,
+            headers=headers,
+        )
 
         return resp

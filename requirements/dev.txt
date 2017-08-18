@@ -13,3 +13,4 @@ Sphinx
 bumpversion
 ipython
 ipdb
+better-exceptions-hook
