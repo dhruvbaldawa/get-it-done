@@ -13,7 +13,6 @@ import tornado.web
 
 from settings import settings
 from get_it_done.urls import url_patterns
-from get_it_done.database import objects
 
 
 class TornadoApplication(tornado.web.Application):

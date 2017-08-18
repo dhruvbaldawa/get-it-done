@@ -42,14 +42,27 @@ class OAuthUser(BaseModel):
             .where(OAuthUser.id == user_id).execute()
 
     def is_token_expiring(self):
-        return (self.token_expiry - datetime.now()).total_seconds() > (30 * MINUTES)
+        return (self.token_expiry - datetime.now()).total_seconds() <= (30 * MINUTES)
 
 
 class GmailThread(BaseModel):
+    STATE_INITIAL = 'initial'
+    STATE_1D = '1d'
+    STATE_3D = '3d'
+    STATE_7D = '7d'
+    STATE_10D = '10d'
+    STATE_14D = '14d'
+    STATE_ARCHIVED = 'archived'
+
+    STATES = (STATE_INITIAL, STATE_1D, STATE_3D, STATE_7D, STATE_10D, STATE_14D, STATE_ARCHIVED)
+
     id = CharField(unique=True, primary_key=True)
     user = ForeignKeyField(OAuthUser, related_name='gmail_threads')
-    labels = ArrayField(field_class=CharField)
-    state = CharField()
-    sent_at = TimestampField()
+    labels = ArrayField(field_class=CharField, default=[])
+    state = CharField(default='initial')
+    sent_at = TimestampField(default=0)
 
-    STATES = ('1d', '3d', '7d', '10d', '14d', 'archived')
+
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

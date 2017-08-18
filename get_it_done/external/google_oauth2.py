@@ -1,9 +1,11 @@
 from http import HTTPStatus
 from urllib.parse import urlencode
 
+import logging
 from aiohttp import ClientSession
 from tornado.options import options
 
+logger = logging.getLogger(__name__)
 
 class ClientError(Exception):
     def __init__(self, status, body, headers):
@@ -27,12 +29,13 @@ class GoogleOAuth2Client(object):
         self.client_secret = client_secret
 
     @staticmethod
-    def _build_authorization_header(self, access_token):
+    def _build_authorization_header(access_token):
         return {
             'Authorization': f'Bearer {access_token}',
         }
 
     async def request(self, method, url, params=None, data=None, headers=None):
+        logger.debug('Making Google OAuth request %s %s', method, url)
         async with ClientSession(raise_for_status=True) as session:
             async with session.request(
                 method=method,

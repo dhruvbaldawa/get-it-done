@@ -3,6 +3,7 @@
 """Global settings for the project"""
 
 import os.path
+import logging.config
 
 from envparse import env
 from tornado.options import define
@@ -33,6 +34,34 @@ settings["google_oauth"] = {
     "key": env("GOOGLE_OAUTH_KEY"),
     "secret": env("GOOGLE_OAUTH_SECRET"),
 }
+
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'stdout': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'tornado': {
+            'handlers': ['stdout'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'get_it_done': {
+            'handlers': ['stdout'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'peewee': {
+            'handlers': ['stdout'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+})
 
 if settings["debug"]:
     import logging
