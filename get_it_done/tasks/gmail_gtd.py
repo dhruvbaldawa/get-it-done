@@ -22,8 +22,8 @@ async def task_load_gmail_messages():
         logger.info("Processing mails for process user %s", user.email)
         logger.info("Fetching user emails")
 
-        email_threads = await gather(*[client.get_email_thread(user.token, thread['id'])
-                                       async for thread in extract_email_threads(user.token, user.id)])
+        email_threads = await gather(*[client.get_email_thread(await user.ensure_token(), thread['id'])
+                                       async for thread in extract_email_threads(await user.ensure_token(), user.id)])
 
         with database.transaction():
             for email_thread in email_threads:
@@ -41,5 +41,5 @@ def task_gmail_messages_next_cycle():
     for message in GmailThread.select().where(GmailThread.state != GmailThread.STATE_FINAL):
         message.next()
 
-async def task_chronos_test():
+def task_chronos_test():
     logger.info('I was running')

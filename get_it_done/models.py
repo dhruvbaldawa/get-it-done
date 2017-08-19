@@ -49,11 +49,10 @@ class OAuthUser(BaseModel):
         OAuthUser.update(access_token=access_token, token_expiry=token_expiry)\
             .where(OAuthUser.id == user_id).execute()
 
-    @property
-    def token(self):
+    async def ensure_token(self):
         if self.is_token_expiring():
             logger.debug('Refreshing the user token for %s', self.email)
-            access_info = run_sync(get_google_client().refresh_access_token(self.refresh_token))
+            access_info = await get_google_client().refresh_access_token(self.refresh_token)
             self.access_token = access_info['access_token']
             self.token_expiry = time.time() + access_info['expires_in']
             self.save()
@@ -92,8 +91,7 @@ class GmailThread(BaseModel):
     sent_at = TimestampField(default=0)
 
     def _generate_transitions(self):
-        return [
-            {
+        return [{
                 'trigger': 'next',
                 'source': [self.STATE_INITIAL, self.STATE_14D],
                 'dest': self.STATE_ARCHIVED,
@@ -141,10 +139,15 @@ class GmailThread(BaseModel):
         ndays = int(state_name[:-1])
         return (datetime.now() - self.sent_at).total_seconds() > (ndays * DAYS)
 
+    def has_time_decreased(self, state_name):
+        ndays = int(state_name[:-1])
+        return (datetime.now() - self.sent_at).total_seconds() < (ndays * DAYS)
+
     def change_labels(self, source, destination):
         logger.debug('changing labels from %s to %s', source, destination)
+        token = run_sync(self.user.ensure_token())
         run_sync(get_google_client().change_thread_label(
-            self.user.token,
+            token,
             self.id,
             self.user.id,
             remove_labels=[self.GMAIL_LABELS[source]],
@@ -153,10 +156,11 @@ class GmailThread(BaseModel):
 
     def archive(self):
         logger.debug('Archiving %s', self.id)
+        token = run_sync(self.user.ensure_token())
         run_sync(get_google_client().change_thread_label(
-            self.user.token,
+            token,
             self.id,
             self.user.id,
-            remove_labels=[self.GMAIL_LABELS[self.state], 'INBOX'],
+            remove_labels=[self.GMAIL_LABELS[self.state]],
             add_labels=[self.GMAIL_LABELS[self.STATE_ARCHIVED]],
         ))
