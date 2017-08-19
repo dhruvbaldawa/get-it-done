@@ -83,7 +83,7 @@ class GmailThread(BaseModel):
         STATE_ARCHIVED: 'Label_61',
     }
 
-    STATES = (STATE_INITIAL, STATE_1D, STATE_3D, STATE_7D, STATE_10D, STATE_14D, STATE_ARCHIVED)
+    STATES = (STATE_INITIAL, STATE_1D, STATE_3D, STATE_7D, STATE_10D, STATE_14D, STATE_ARCHIVED, STATE_FINAL)
 
     id = CharField(unique=True, primary_key=True)
     user = ForeignKeyField(OAuthUser, related_name='gmail_threads')
@@ -139,7 +139,7 @@ class GmailThread(BaseModel):
 
     def has_time_elapsed(self, state_name):
         ndays = int(state_name[:-1])
-        return (datetime.now() - self.sent_at).total_seconds() > ndays * DAYS
+        return (datetime.now() - self.sent_at).total_seconds() > (ndays * DAYS)
 
     def change_labels(self, source, destination):
         logger.debug('changing labels from %s to %s', source, destination)

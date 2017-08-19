@@ -39,7 +39,7 @@ logging.config.dictConfig({
     'disable_existing_loggers': False,
     'formatters': {
         'default': {
-            'format': ' %(levelname)s [%(asctime)s][%(name)s.%(funcName)s:%(lineno)d] %(message)s',
+            'format': '%(levelname)s [%(asctime)s][%(name)s.%(funcName)s:%(lineno)d] %(message)s',
             'datefmt': '%Y-%m-%d %H:%M:%S',
         }
     },
