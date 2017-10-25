@@ -3,6 +3,9 @@ get_it_done
 
 Repository  of helpers to help me get stuff done
 
+ - Current tools: applies time-based labels to gmail unread emails based on their
+                  age in the inbox
+
 Credits
 -------
 
